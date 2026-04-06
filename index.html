@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Save the Record - 초등용</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#FFFFFF;--accent:#FFD700;--accent2:#FFC107;--text:#222222;--red:#E53935;--green:#43A047;--gray:#BDBDBD;--light:#F5F5F5;--border:#222222;}
+body{font-family:'DotGothic16',monospace;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.pixel-font{font-family:'Press Start 2P',monospace;}
+.container{max-width:640px;margin:0 auto;padding:16px;min-height:100vh;}
+button{font-family:'DotGothic16',monospace;cursor:pointer;border:3px solid var(--border);background:var(--bg);color:var(--text);padding:10px 16px;font-size:15px;transition:background 0.1s;}
+button:hover{background:var(--accent);}
+button:active{transform:translate(2px,2px);}
+input{font-family:'DotGothic16',monospace;border:3px solid var(--border);padding:8px 12px;font-size:16px;outline:none;background:var(--bg);}
+input:focus{border-color:var(--accent);}
+.hidden{display:none!important;}
+
+/* LOGIN */
+#login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;gap:20px;}
+#login h1{font-family:'Press Start 2P',monospace;font-size:clamp(18px,5vw,32px);letter-spacing:2px;line-height:1.6;}
+#login .subtitle{font-size:18px;color:#555;margin-bottom:16px;overflow:hidden;white-space:nowrap;width:100%;max-width:400px;}
+#login .subtitle .marquee{display:inline-block;animation:marquee 6s linear infinite;}
+@keyframes marquee{0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
+#login input{width:240px;text-align:center;font-size:18px;}
+#login .error{color:var(--red);font-size:14px;min-height:20px;}
+#login button{font-size:16px;padding:12px 32px;background:var(--accent);font-weight:bold;}
+.cursor-blink::after{content:'_';animation:blink 0.7s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* TOP BAR */
+.top-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:3px solid var(--border);margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.top-bar .level{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--accent2);}
+.top-bar .count{font-size:14px;}
+.back-btn{font-size:14px;padding:6px 12px;background:var(--light);}
+
+/* CATEGORIES */
+#categories .greeting{font-size:16px;margin-bottom:16px;padding:12px;border:3px solid var(--accent);background:#FFFDE7;}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+@media(max-width:420px){.cat-grid{grid-template-columns:1fr;}}
+.cat-btn{text-align:left;padding:14px;font-size:14px;line-height:1.5;position:relative;}
+.cat-btn .cat-count{font-size:12px;color:#777;margin-top:4px;}
+.cat-btn.completed{border-color:var(--green);background:#E8F5E9;}
+.cat-btn.completed::after{content:'\2605';position:absolute;top:6px;right:8px;color:var(--accent);font-size:16px;}
+
+/* BADGES */
+.badges-section{margin-top:16px;padding:12px;border:3px solid var(--border);}
+.badges-section h3{font-family:'Press Start 2P',monospace;font-size:10px;margin-bottom:10px;}
+.badge-list{display:flex;flex-wrap:wrap;gap:6px;}
+.badge-item{font-size:12px;padding:4px 8px;border:2px solid var(--gray);color:var(--gray);}
+.badge-item.earned{border-color:var(--accent);color:var(--text);background:#FFFDE7;}
+
+/* HERITAGE LIST */
+.heritage-list{display:flex;flex-direction:column;gap:8px;}
+.heritage-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border:3px solid var(--border);font-size:14px;}
+.heritage-item:hover{background:var(--accent);cursor:pointer;}
+.heritage-item .check{color:var(--green);font-size:18px;min-width:24px;text-align:center;}
+.heritage-item .pending{color:var(--gray);font-size:18px;min-width:24px;text-align:center;}
+.heritage-item .info{flex:1;}
+.heritage-item .h-name{font-weight:bold;}
+.heritage-item .h-meta{font-size:12px;color:#666;margin-top:2px;}
+
+/* REPORT */
+.report-header{padding:12px;border:3px solid var(--accent);background:#FFFDE7;margin-bottom:16px;position:sticky;top:0;z-index:100;}
+.report-header h2{font-size:18px;margin-bottom:6px;}
+.report-header .meta{font-size:13px;color:#555;}
+.report-header .desc{font-size:13px;color:#444;margin-top:8px;line-height:1.6;}
+.report-header .report-img{width:100%;max-height:200px;object-fit:contain;border:3px solid var(--border);margin-bottom:10px;background:var(--light);}
+.report-progress{font-family:'Press Start 2P',monospace;font-size:10px;text-align:right;margin-bottom:12px;color:var(--accent2);}
+.inv-list{display:flex;flex-direction:column;gap:10px;}
+.inv-item{border:3px solid var(--border);padding:12px;}
+.inv-item.completed{border-color:var(--green);}
+.inv-label{font-size:12px;color:#777;margin-bottom:2px;display:flex;align-items:center;gap:6px;}
+.inv-label .status-icon{font-size:12px;}
+.inv-sublabel{font-weight:bold;font-size:15px;margin-bottom:8px;color:var(--text);}
+.inv-content{font-size:14px;line-height:1.7;margin-top:8px;white-space:pre-wrap;}
+.inv-connection{margin-top:10px;padding:10px;background:#FFFDE7;border:2px solid var(--accent);font-size:13px;line-height:1.6;}
+.inv-connection .conn-title{font-weight:bold;color:var(--accent2);margin-bottom:4px;font-size:12px;}
+.code-input-area{margin-top:8px;display:flex;gap:8px;align-items:center;}
+.digit-box{width:44px;height:50px;text-align:center;font-size:16px;font-family:'Press Start 2P',monospace;border:3px solid var(--border);}
+.digit-box:focus{border-color:var(--accent);background:#FFFDE7;}
+.code-submit{padding:10px 16px;font-size:14px;background:var(--accent);font-weight:bold;}
+.code-error{color:var(--red);font-size:12px;margin-top:4px;min-height:18px;}
+.locked-msg{color:var(--gray);font-size:13px;margin-top:4px;}
+
+/* TOAST */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border:3px solid var(--border);font-size:14px;z-index:1000;animation:toastIn 0.3s;max-width:90vw;text-align:center;}
+.toast.success{background:#E8F5E9;border-color:var(--green);}
+.toast.error{background:#FFEBEE;border-color:var(--red);}
+.toast.level-up{background:#FFFDE7;border-color:var(--accent);font-family:'Press Start 2P',monospace;font-size:12px;}
+.toast.badge-earned{background:#FFFDE7;border-color:var(--accent);}
+@keyframes toastIn{from{opacity:0;top:0;}to{opacity:1;top:20px;}}
+
+/* SHAKE */
+@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-6px);}40%,80%{transform:translateX(6px);}}
+.shake{animation:shake 0.4s;}
+
+/* OVERLAY */
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:2000;}
+.overlay-box{background:var(--bg);border:4px solid var(--accent);padding:32px;text-align:center;max-width:360px;width:90%;}
+.overlay-box h2{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--accent2);margin-bottom:16px;}
+.overlay-box p{font-size:15px;line-height:1.6;margin-bottom:16px;}
+.overlay-box button{font-size:14px;padding:10px 24px;}
+
+/* COMPLETE OVERLAY */
+.complete-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:2500;}
+.complete-box{background:var(--bg);border:4px solid var(--accent);padding:24px;text-align:center;max-width:400px;width:92%;max-height:90vh;overflow-y:auto;}
+.complete-box h2{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--accent2);margin-bottom:16px;line-height:1.6;}
+.complete-img{width:100%;max-height:240px;object-fit:contain;border:3px solid var(--border);margin-bottom:14px;background:var(--light);}
+.complete-name{font-size:20px;font-weight:bold;margin-bottom:6px;}
+.complete-meta{font-size:14px;color:#555;margin-bottom:6px;}
+.complete-source{font-size:10px;color:var(--gray);margin-bottom:16px;}
+.complete-box button{font-size:15px;padding:12px 32px;background:var(--accent);font-weight:bold;}
+
+/* STARS */
+.stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3000;}
+.star{position:absolute;font-size:24px;animation:starFall 1s forwards;}
+@keyframes starFall{0%{opacity:1;transform:scale(0) rotate(0deg);}50%{opacity:1;transform:scale(1.2) rotate(180deg);}100%{opacity:0;transform:scale(0.5) rotate(360deg) translateY(60px);}}
+
+/* CELEBRATION */
+.celebration{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3000;}
+.confetti{position:absolute;width:8px;height:8px;animation:confettiFall 1.5s forwards;}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(100vh) rotate(720deg);}}
+
+/* TYPEWRITER */
+@keyframes typeChar{from{opacity:0;}to{opacity:1;}}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-track{background:var(--light);}
+::-webkit-scrollbar-thumb{background:var(--gray);border:2px solid var(--light);}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- LOGIN SCREEN -->
+<div id="login">
+  <h1 class="pixel-font">Save the<br>Record</h1>
+  <div class="subtitle"><span class="marquee">기록을 저장하라. 기록을 구하라.</span></div>
+  <input type="text" id="codeInput" placeholder="학급 코드 입력" maxlength="10" autocomplete="off">
+  <div class="error" id="loginError"></div>
+  <button onclick="tryLogin()">로그인</button>
+</div>
+
+<!-- CATEGORIES SCREEN -->
+<div id="categories" class="hidden">
+  <div class="top-bar">
+    <div>
+      <div class="level" id="levelDisplay"></div>
+      <div class="count" id="countDisplay"></div>
+    </div>
+    <button class="back-btn" onclick="logout()">로그아웃</button>
+  </div>
+  <div class="greeting">기록관님, 탐사할 시대를 선택하세요.</div>
+  <div class="cat-grid" id="catGrid"></div>
+  <div class="badges-section">
+    <h3>획득 뱃지</h3>
+    <div class="badge-list" id="badgeList"></div>
+  </div>
+</div>
+
+<!-- HERITAGE LIST SCREEN -->
+<div id="heritageList" class="hidden">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showCategories()">< 시대 선택</button>
+    <div class="level" id="levelDisplay2"></div>
+  </div>
+  <h2 id="catTitle" style="font-size:16px;margin-bottom:12px;"></h2>
+  <div class="heritage-list" id="hList"></div>
+</div>
+
+<!-- REPORT SCREEN -->
+<div id="report" class="hidden">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showHeritage(currentCategory)">< 유산 목록</button>
+    <div class="report-progress" id="reportProgress"></div>
+  </div>
+  <div class="report-header">
+    <img class="report-img" id="reportImg" src="" alt="">
+    <h2 id="reportName"></h2>
+    <div class="meta" id="reportMeta"></div>
+    <div class="desc" id="reportDesc"></div>
+  </div>
+  <div class="inv-list" id="invList"></div>
+</div>
+
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay hidden" id="overlay">
+  <div class="overlay-box">
+    <h2 id="overlayTitle"></h2>
+    <p id="overlayMsg"></p>
+    <button onclick="hideOverlay()">확인</button>
+  </div>
+</div>
+
+<!-- COMPLETE OVERLAY -->
+<div class="complete-overlay hidden" id="completeOverlay">
+  <div class="complete-box">
+    <h2>REPORT COMPLETE!</h2>
+    <img class="complete-img" id="completeImg" src="" alt="">
+    <div class="complete-name" id="completeName"></div>
+    <div class="complete-meta" id="completeMeta"></div>
+    <div class="complete-source" id="completeSource"></div>
+    <button onclick="closeComplete()">확인</button>
+  </div>
+</div>
+
+<!-- STARS CONTAINER -->
+<div class="stars hidden" id="starsContainer"></div>
+
+<script>
+// === GAME DATA ===
+const GAME_DATA = [
+  {no:1, category:"고려", name:"해인사 대장경판", country:"한국", year:2007, difficulty:3, desc:"몽골 침입 때 부처님의 힘으로 나라를 지키려고 만든 81,258장의 나무판 불교 경전", items:{
+    "생산 배경":{method:"웹제공", code:"", content:"고려 시대, 몽골이 쳐들어왔어요. 나라가 위험해지자 사람들은 부처님의 힘으로 나라를 지키고 싶었어요. 그래서 불교 경전을 나무판에 하나하나 새기기 시작했어요. 무려 16년이나 걸린 큰 프로젝트였어요.", connection:"나라가 위험할 때 기록을 만든다는 것은, 기록이 단순한 정보가 아니라 사람들의 소망과 의지를 담는다는 뜻이에요."},
+    "생산 방법":{method:"카드", code:"117", content:"나무판 81,258장에 글자를 새겼어요. 글자 수만 5,200만 자가 넘어요. 놀라운 건 틀린 글자가 거의 없다는 거예요. 나무가 썩지 않도록 특별한 처리도 했어요. 아주 꼼꼼하고 정교하게 만든 기록이에요.", connection:"기록을 만들 때 정확하게 만드는 것은 기록관리에서 가장 중요한 원칙이에요. 틀린 정보가 들어가면 나중에 큰 문제가 될 수 있거든요."},
+    "생존 이야기":{method:"카드", code:"104", content:"처음에는 강화도에 있다가 해인사로 옮겨졌어요. 해인사 장경판전은 바람이 잘 통하는 특별한 건물이에요. 덕분에 나무판이 770년이 넘도록 잘 보존될 수 있었어요. 한국전쟁 때 폭격 위기도 있었지만, 다행히 살아남았어요.", connection:"기록을 오래 보관하려면 보관 장소가 아주 중요해요. 해인사 장경판전은 자연 바람으로 온도와 습도를 조절하는 아주 똑똑한 건물이에요."},
+    "기록문화적 가치":{method:"카드", code:"123", content:"세계에서 가장 큰 규모의 불교 경전 목판이에요. 81,258장에 틀린 글자가 거의 없을 만큼 정교해요. 2007년에 유네스코 세계기록유산이 되었어요.", connection:"기록이 세계기록유산이 되려면 '이 기록이 왜 중요한지'를 설명할 수 있어야 해요. 기록의 가치를 판단하는 것도 기록 전문가의 중요한 일이에요."},
+    "현재 보존 방법":{method:"웹제공", code:"", content:"경남 합천 해인사 장경판전에 원래 모습 그대로 보관되어 있어요. 장경판전 자체도 유네스코 세계유산이에요. 자연 바람으로 온도와 습도를 조절하는 아주 똑똑한 건물이에요.", connection:""},
+    "접근·열람 방법":{method:"웹제공", code:"", content:"해인사에 가면 장경판전 건물을 볼 수 있어요. 하지만 나무판 원본을 직접 만지거나 가까이 볼 수는 없어요. 인터넷에서 대장경 내용을 검색해 볼 수 있어요.", connection:""}
+  }},
+  {no:2, category:"고려", name:"직지심체요절", country:"한국", year:2001, difficulty:1, desc:"세계에서 가장 오래된 금속활자 인쇄물. 구텐베르크보다 78년 앞섬", items:{
+    "생산 배경":{method:"웹제공", code:"", content:"고려 시대 백운 스님이 불교의 중요한 가르침을 모아 책으로 만들었어요. 1377년 충청북도 청주 흥덕사라는 절에서 금속활자로 찍어냈어요. 스님의 제자들이 스승의 가르침을 널리 알리고 싶었거든요.", connection:""},
+    "생산 방법":{method:"카드", code:"108", content:"금속으로 글자 하나하나를 만들어서 판에 끼우고 인쇄했어요. 이것을 '금속활자 인쇄'라고 해요. 독일 구텐베르크가 금속활자로 성경을 찍은 것보다 78년이나 앞선 기술이에요!", connection:"기록을 만드는 기술은 시대마다 달라요. 금속활자는 같은 내용을 여러 번 찍을 수 있어서, 기록을 널리 퍼뜨리는 데 아주 중요한 발명이었어요."},
+    "생존 이야기":{method:"웹제공", code:"", content:"프랑스 사람이 한국에서 이 책을 가져갔어요. 지금은 프랑스 국립도서관에 아래 권 1책만 남아 있어요. 위 권은 어디 있는지 아직 모른답니다. 세계에서 딱 1권만 남은 아주 귀한 책이에요.", connection:""},
+    "기록문화적 가치":{method:"웹제공", code:"", content:"세계에서 가장 오래된 금속활자 인쇄물이에요. 2001년에 유네스코 세계기록유산이 되었어요. 유네스코에서는 이 책을 기념해서 '직지상'이라는 상도 만들었어요.", connection:""},
+    "현재 보존 방법":{method:"웹제공", code:"", content:"프랑스 파리에 있는 프랑스 국립도서관에서 아주 조심스럽게 보관하고 있어요. 한국 청주에는 고인쇄박물관이 있어서 직지와 금속활자에 대해 배울 수 있어요.", connection:""},
+    "접근·열람 방법":{method:"웹제공", code:"", content:"프랑스 국립도서관의 인터넷 사이트에서 사진으로 볼 수 있어요. 청주고인쇄박물관에 가면 금속활자로 직접 인쇄하는 체험도 할 수 있어요.", connection:""}
+  }},
+  {no:3, category:"조선", name:"조선왕조실록", country:"한국", year:1997, difficulty:4, desc:"472년간 27명 왕의 역사를 기록한 1,893권의 책. 왕도 볼 수 없었던 기록", items:{
+    "생산 배경":{method:"웹제공", code:"", content:"조선은 '역사에서 배우자'는 생각으로 왕이 바뀔 때마다 이전 왕의 이야기를 정리해서 남겼어요. 472년 동안 27명의 왕 이야기가 1,893권의 책에 담겨 있어요.", connection:""},
+    "생산 방법":{method:"카드", code:"112", content:"사관이라는 기록 전문가가 왕 옆에서 모든 것을 적었어요. 왕이 뭐라고 말했는지, 누구를 만났는지 다 기록했어요. 놀라운 점은 왕도 이 기록을 볼 수 없었다는 거예요! 기록이 바뀌지 않도록 지킨 거예요.", connection:"기록을 만드는 사람이 누구의 눈치도 보지 않는 것은 오늘날에도 아주 중요한 원칙이에요. 기록 전문가는 누구의 압력에도 기록을 바꾸면 안 돼요."},
+    "생존 이야기":{method:"카드", code:"126", content:"임진왜란이 일어나자 4곳에 있던 실록 중 3곳이 불에 탔어요. 전주에 있던 1부만 살아남았어요. 마을 사람들이 산속에 숨겨서 지켰거든요. 전쟁이 끝나고 나라에서 다시 5부를 만들어 5곳에 나누어 보관했어요.", connection:"중요한 기록은 한 곳에만 두면 위험해요. 여러 곳에 나누어 보관하는 것을 '분산 보존'이라고 해요. 지금도 기록 전문가들이 꼭 지키는 원칙이에요."},
+    "기록문화적 가치":{method:"카드", code:"101", content:"472년 동안 한 나라의 역사를 빠짐없이 기록한 건 세계에서 조선왕조실록이 유일해요. 1997년에 유네스코 세계기록유산이 되었어요.", connection:"이 기록이 특별한 이유는 '빠짐없이' 기록했다는 거예요. 기록에 빈 구멍이 없다는 것은 그 기록의 가치를 아주 높여줘요."},
+    "현재 보존 방법":{method:"웹제공", code:"", content:"서울대학교 규장각 등 여러 곳에 나누어 보관하고 있어요. 온도와 습도를 맞춘 특별한 방에서 관리해요. 국보 제151호로 지정되어 있어요.", connection:""},
+    "접근·열람 방법":{method:"카드", code:"119", content:"조선왕조실록 홈페이지(sillok.history.go.kr)에서 누구나 무료로 읽을 수 있어요. 한글 번역도 되어 있어서 어린이도 찾아볼 수 있어요.", connection:"원본은 보호하면서 내용은 누구나 볼 수 있게 하는 것, 이것이 기록 서비스의 가장 좋은 모습이에요."}
+  }},
+  {no:4, category:"조선", name:"훈민정음 해례본", country:"한국", year:1997, difficulty:2, desc:"세종대왕이 한글을 만든 원리를 설명한 책. 세계에 딱 1권만 남음", items:{
+    "생산 배경":{method:"웹제공", code:"", content:"세종대왕은 백성들이 글자를 몰라서 하고 싶은 말을 제대로 전할 수 없는 것을 안타깝게 여겼어요. 그래서 누구나 쉽게 배울 수 있는 새로운 글자, 한글을 만들었어요.", connection:""},
+    "생산 방법":{method:"웹제공", code:"", content:"세종대왕이 직접 글자를 설계하고, 집현전 학자들이 설명을 썼어요. 1446년에 나무판에 새겨서 인쇄했어요. 한글이 어떤 원리로 만들어졌는지 설명하는 책이에요.", connection:""},
+    "생존 이야기":{method:"카드", code:"130", content:"일제강점기와 한국전쟁이라는 큰 위기를 겪었어요. 소장자가 목숨을 걸고 지켜냈어요. 1940년에 경북 안동에서 다시 발견되었어요. 전 세계에 딱 1권만 남아 있는 아주 귀한 책이에요.", connection:"딱 1권만 남은 기록은 잃어버리면 영원히 사라져요. 그래서 기록 전문가들은 중요한 기록은 꼭 복사본을 만들어 여러 곳에 보관해요."},
+    "기록문화적 가치":{method:"카드", code:"105", content:"글자를 만든 원리를 설명한 책이 남아 있는 건 세계에서 훈민정음이 유일해요. 1997년에 유네스코 세계기록유산이 되었어요.", connection:"세상에 하나밖에 없는 기록은 그 자체로 엄청난 가치가 있어요. 기록의 가치를 판단하는 것도 기록 전문가의 중요한 일이에요."},
+    "현재 보존 방법":{method:"웹제공", code:"", content:"서울 간송미술관에서 국보 제70호로 보관하고 있어요. 온도와 습도를 맞춘 특별한 환경에서 관리해요.", connection:""},
+    "접근·열람 방법":{method:"웹제공", code:"", content:"원본은 특별 전시 때만 볼 수 있어요. 국립한글박물관에 가면 복제본을 언제든 볼 수 있고, 한글이 만들어진 이야기도 배울 수 있어요.", connection:""}
+  }},
+  {no:5, category:"조선", name:"난중일기", country:"한국", year:2013, difficulty:1, desc:"이순신 장군이 임진왜란 7년간 전쟁터에서 직접 쓴 일기", items:{
+    "생산 배경":{method:"웹제공", code:"", content:"이순신 장군이 임진왜란(1592~1598) 동안 전쟁터에서 직접 쓴 일기예요. 7년 동안 전투 이야기, 날씨, 자신의 마음까지 솔직하게 기록했어요.", connection:""},
+    "생산 방법":{method:"웹제공", code:"", content:"이순신 장군이 직접 붓으로 썼어요. 총 7권이에요. 매일매일 전투 상황, 군사 소식, 날씨, 그리고 자신의 걱정과 슬픔까지 적었어요. 전쟁의 마지막 날 전날까지 기록이 남아 있어요.", connection:""},
+    "생존 이야기":{method:"웹제공", code:"", content:"이순신 장군의 후손들이 대대로 소중하게 보관해 왔어요. 일제강점기와 한국전쟁을 거치면서도 잘 지켜냈어요. 지금은 아산 현충사에 보관되어 있어요.", connection:""},
+    "기록문화적 가치":{method:"웹제공", code:"", content:"전쟁터에서 장군이 직접 쓴 일기는 매우 드물어요. 전쟁 기록이면서 한 사람의 솔직한 마음이 담긴 특별한 기록이에요. 2013년에 유네스코 세계기록유산이 되었어요.", connection:""},
+    "현재 보존 방법":{method:"카드", code:"114", content:"아산 현충사 유물관에 국보 제76호로 보존되어 있어요. 온도와 습도를 맞춘 특별한 시설에서 관리하고 있어요.", connection:"오래된 종이 기록을 지키려면 온도와 습도를 잘 맞춰야 해요. 너무 덥거나 습하면 종이가 상하거든요. 이것을 관리하는 게 기록 전문가의 중요한 일이에요."},
+    "접근·열람 방법":{method:"웹제공", code:"", content:"현충사에 가면 복제본과 관련 전시를 볼 수 있어요. 인터넷에서 한글 번역문을 읽어볼 수도 있어요.", connection:""}
+  }},
+  {no:6, category:"조선", name:"동의보감", country:"한국", year:2009, difficulty:2, desc:"허준이 14년 걸려 만든 의학 백과사전. 25권에 모든 의학 지식을 담음", items:{
+    "생산 배경":{method:"웹제공", code:"", content:"임진왜란으로 나라가 엉망이 되고 아픈 사람이 넘쳐났어요. 왕의 명을 받은 의사 허준은 누구나 병을 치료할 수 있도록 의학 지식을 한 권의 책에 모으기로 했어요. 14년이나 걸려서 완성했어요.", connection:""},
+    "생산 방법":{method:"카드", code:"121", content:"허준이 혼자서 썼지만, 왕실의 도움을 받았어요. 총 25권으로, 몸의 안과 밖, 여러 가지 병, 약, 침과 뜸까지 다 정리했어요. 한글로 약 이름을 적어서 일반 사람도 알 수 있게 했어요.", connection:"기록을 만들 때 누구나 이해할 수 있게 쓰는 것은 아주 중요해요. 허준은 한자만 쓰지 않고 한글도 함께 써서 더 많은 사람이 읽을 수 있게 했어요."},
+    "생존 이야기":{method:"웹제공", code:"", content:"1613년에 인쇄된 후 여러 번 다시 찍어냈어요. 일본과 중국에서도 번역해서 출판했어요. 여러 곳에 여러 권이 남아 있어서 안전하게 전해져 왔어요.", connection:""},
+    "기록문화적 가치":{method:"웹제공", code:"", content:"동아시아의 의학 지식을 모두 모은 의학 백과사전이에요. 2009년에 유네스코 세계기록유산이 되었어요.", connection:""},
+    "현재 보존 방법":{method:"웹제공", code:"", content:"국립중앙도서관 등 여러 곳에 보관되어 있어요. 원래 인쇄할 때 쓴 나무판도 보물로 지정되어 보존 중이에요.", connection:""},
+    "접근·열람 방법":{method:"카드", code:"109", content:"인터넷 한국고전종합DB에서 원문과 번역을 읽을 수 있어요. 서울 강서구에 있는 허준박물관에 가면 관련 전시를 볼 수 있어요.", connection:"기록을 인터넷에 올려서 누구나 볼 수 있게 하는 것을 '디지털 서비스'라고 해요. 기록 전문가의 중요한 일 중 하나예요."}
+  }},
+  {no:7, category:"근현대", name:"국채보상운동 기록물", country:"한국", year:2017, difficulty:3, desc:"일본에 진 빚을 국민이 힘 모아 갚으려 한 운동의 기록. 인구 25% 참여", items:{
+    "생산 배경":{method:"웹제공", code:"", content:"1907년, 일본이 우리나라에 많은 돈을 빌려주고 나라를 지배하려 했어요. 대구에서 시작된 이 운동은 '우리 힘으로 빚을 갚자!'며 전국으로 퍼졌어요. 국민의 25%나 참여한 대단한 운동이었어요.", connection:""},
+    "생산 방법":{method:"카드", code:"116", content:"돈을 모은 사람들의 명단, 영수증, 신문 기사, 단체들의 편지 등 다양한 기록이 만들어졌어요. 당시 신문들이 이 운동을 적극적으로 알려서 기록이 많이 남았어요.", connection:"하나의 사건에 대해 여러 종류의 기록이 있으면 더 정확하게 알 수 있어요. 명단, 영수증, 신문 기사가 서로를 확인해 주거든요."},
+    "생존 이야기":{method:"카드", code:"103", content:"일제가 이 운동을 막으려 했지만, 신문 기사와 개인이 보관한 문서 덕분에 기록이 살아남았어요. 광복 후에 학자들이 흩어진 기록을 다시 모았어요.", connection:"누군가가 기록을 없애려 해도, 여러 곳에 흩어져 있으면 완전히 없앨 수 없어요. 이것이 기록을 여러 곳에 보관하는 이유예요."},
+    "기록문화적 가치":{method:"카드", code:"128", content:"국민이 스스로 나서서 나라를 지키려 한 운동의 기록이에요. 2017년에 유네스코 세계기록유산이 되었어요.", connection:"보통 사람들이 만든 기록도 아주 중요해요. 정부가 만든 기록만으로는 알 수 없는 이야기가 담겨 있거든요."},
+    "현재 보존 방법":{method:"웹제공", code:"", content:"대구 국채보상운동기념관에 주요 기록이 보관되어 있어요. 국가기록원과 국립중앙도서관에도 관련 자료가 있어요.", connection:""},
+    "접근·열람 방법":{method:"웹제공", code:"", content:"대구 국채보상운동기념관에 가면 자료를 직접 볼 수 있어요. 국가기록원 인터넷 사이트에서도 검색할 수 있어요.", connection:""}
+  }},
+  {no:8, category:"근현대", name:"제주4·3 기록물", country:"한국", year:2025, difficulty:4, desc:"제주도에서 일어난 슬픈 사건의 기록. 숨겨졌던 진실을 밝히는 데 기록이 중요하다는 것을 보여줌", items:{
+    "생산 배경":{method:"웹제공", code:"", content:"1947년부터 1954년까지 제주도에서 아주 슬픈 일이 일어났어요. 많은 제주도 사람들이 다치거나 목숨을 잃었어요. 이때 만들어진 문서, 사진, 사람들의 이야기가 기록으로 남았어요.", connection:""},
+    "생산 방법":{method:"카드", code:"125", content:"군대와 경찰이 쓴 문서, 재판 기록, 피해를 입은 사람들의 이야기, 현장 사진 등이 있어요. 피해를 준 쪽과 피해를 입은 쪽, 양쪽의 기록이 모두 남아 있어요.", connection:"한쪽의 기록만 있으면 진실을 알기 어려워요. 여러 쪽의 기록이 모두 있어야 무슨 일이 있었는지 제대로 알 수 있어요."},
+    "생존 이야기":{method:"카드", code:"106", content:"오랫동안 이 일에 대해 말하는 것이 금지되었어요. 피해자들도 이야기하기를 두려워했어요. 2000년에 특별법이 만들어진 후에야 기록을 모으고 진실을 밝히기 시작했어요.", connection:"기록이 숨겨지면 진실도 숨겨져요. 기록을 지키고 공개하는 것은 진실을 밝히는 가장 중요한 방법이에요."},
+    "기록문화적 가치":{method:"카드", code:"120", content:"숨겨졌던 진실을 밝히는 데 기록이 얼마나 중요한지 보여줘요. 2025년에 유네스코 세계기록유산이 되었어요.", connection:"아픈 역사의 기록도 소중하게 보관해야 해요. 같은 슬픔이 반복되지 않도록 하는 것이 기록의 힘이에요."},
+    "현재 보존 방법":{method:"카드", code:"113", content:"제주4·3평화재단, 국가기록원 등에 보관되어 있어요. 제주4·3평화기념관에서 기록물을 보존하고 전시하고 있어요. 사람들의 이야기를 녹음해서 모으는 작업도 하고 있어요.", connection:"사람들의 이야기를 녹음해서 기록으로 남기는 것을 '구술 기록'이라고 해요. 문서에 없는 생생한 이야기를 보존하는 중요한 방법이에요."},
+    "접근·열람 방법":{method:"웹제공", code:"", content:"제주4·3평화기념관에 가면 관련 자료를 볼 수 있어요. 인터넷에서도 검색할 수 있어요.", connection:""}
+  }},
+  {no:9, category:"근현대", name:"4·19혁명 기록물", country:"한국", year:2023, difficulty:3, desc:"학생과 시민이 부정선거에 맞서 일어난 아시아 최초의 민주혁명 기록", items:{
+    "생산 배경":{method:"웹제공", code:"", content:"1960년, 대통령이 선거에서 부정을 저질렀어요. 이에 화가 난 학생들과 시민들이 거리로 나와 '공정한 선거를 하라!'고 외쳤어요. 이것이 4·19혁명이에요.", connection:""},
+    "생산 방법":{method:"카드", code:"111", content:"학생들이 쓴 선언문, 시위 현장 사진과 영상, 정부 문서, 신문 기사 등이 있어요. 시민들과 기자들이 현장에서 직접 찍은 사진이 많아요.", connection:"사건이 일어나는 바로 그 순간에 만들어진 기록은 아주 귀해요. 나중에 기억으로 쓴 것보다 훨씬 정확하거든요."},
+    "생존 이야기":{method:"웹제공", code:"", content:"이후 군사 정권 시절에 일부 기록이 감춰지거나 훼손되었어요. 하지만 시민들과 기자들이 개인적으로 보관한 자료 덕분에 살아남았어요. 민주화 이후에 체계적으로 모아졌어요.", connection:""},
+    "기록문화적 가치":{method:"카드", code:"127", content:"아시아에서 처음으로 학생과 시민이 힘을 모아 이룬 민주혁명의 기록이에요. 2023년에 유네스코 세계기록유산이 되었어요.", connection:"학생들과 시민들이 직접 만든 기록은 그 시대를 가장 생생하게 보여줘요. 기록은 그 시대를 살았던 사람들의 목소리예요."},
+    "현재 보존 방법":{method:"카드", code:"102", content:"국가기록원, 4·19혁명기념도서관 등에 보관되어 있어요. 디지털로 만드는 작업이 진행 중이에요.", connection:"오래된 기록을 디지털로 바꾸면 더 안전하게 보관할 수 있고, 더 많은 사람이 볼 수 있어요."},
+    "접근·열람 방법":{method:"웹제공", code:"", content:"서울 강북구에 있는 4·19혁명기념도서관에 가면 관련 자료를 볼 수 있어요. 국가기록원 인터넷 사이트에서도 검색할 수 있어요.", connection:""}
+  }},
+  {no:10, category:"근현대", name:"산림녹화 기록물", country:"한국", year:2025, difficulty:1, desc:"전쟁 후 민둥산을 푸른 숲으로 되살린 세계 유일의 성공 사례 기록", items:{
+    "생산 배경":{method:"웹제공", code:"", content:"한국전쟁 후 우리나라의 산은 나무가 거의 없는 민둥산이었어요. 정부와 국민이 힘을 모아 나무를 심기 시작했어요. 헐벗은 산을 푸른 숲으로 바꾼 대단한 일이에요.", connection:""},
+    "생산 방법":{method:"웹제공", code:"", content:"정부가 만든 계획서, 실행 보고서, 통계 자료, 현장 사진 등이 있어요. 중앙 정부부터 마을 단위까지, 모든 단계의 기록이 남아 있어요.", connection:""},
+    "생존 이야기":{method:"웹제공", code:"", content:"정부 기록이라서 국가기록원에서 잘 보관해 왔어요. 영구히 보존해야 할 중요한 기록으로 분류되어 있어요.", connection:""},
+    "기록문화적 가치":{method:"카드", code:"118", content:"전쟁으로 망가진 산을 되살린 건 세계에서 우리나라가 거의 유일해요. 다른 나라들의 본보기가 되는 기록이에요. 2025년에 유네스코 세계기록유산이 되었어요.", connection:"성공한 경험을 기록으로 남기면 다른 사람들도 배울 수 있어요. 기록은 미래를 위한 선물이에요."},
+    "현재 보존 방법":{method:"웹제공", code:"", content:"국가기록원과 산림청에 보관되어 있어요. 문서와 사진, 영상 자료가 잘 정리되어 있어요.", connection:""},
+    "접근·열람 방법":{method:"웹제공", code:"", content:"국가기록원 인터넷 사이트에서 검색할 수 있어요. 산림청 산림박물관에 가면 관련 전시를 볼 수 있어요.", connection:""}
+  }},
+  {no:11, category:"근현대", name:"5·18 민주화운동 기록물", country:"한국", year:2011, difficulty:4, desc:"광주 시민들이 민주주의를 지키기 위해 일어난 운동의 기록", items:{
+    "생산 배경":{method:"웹제공", code:"", content:"1980년 5월, 광주에서 시민들이 군사 정권에 맞서 민주주의를 지키기 위해 일어났어요. 이때 만들어진 문서, 사진, 영상이 모두 기록으로 남았어요.", connection:""},
+    "생산 방법":{method:"카드", code:"124", content:"시민들이 쓴 글, 현장 사진과 영상, 군대 문서, 외국 뉴스 보도, 피해자들의 이야기 등 다양한 형태의 기록이 만들어졌어요. 여러 사람이 여러 방법으로 남긴 기록이에요.", connection:"한 사건에 대해 여러 사람이 여러 방법으로 기록하면, 더 완전한 이야기를 알 수 있어요. 이것을 '다원적 기록'이라고 해요."},
+    "생존 이야기":{method:"카드", code:"107", content:"군사 정권은 진실을 숨기려 했어요. 하지만 시민들이 사진과 영상을 몰래 보관했어요. 민주화가 된 후에 숨겨졌던 군대 문서도 공개되었고, 기록이 체계적으로 모아졌어요.", connection:"기록을 숨기려는 힘과 기록을 지키려는 힘이 싸울 때, 결국 기록을 지키는 쪽이 이겨요. 기록은 진실의 편이에요."},
+    "기록문화적 가치":{method:"카드", code:"129", content:"시민들이 민주주의를 지키기 위해 싸운 기록이에요. 전 세계 민주화운동의 본보기로 평가받아요. 2011년에 유네스코 세계기록유산이 되었어요.", connection:"이 기록이 세계기록유산이 된 건, 한 나라의 이야기가 아니라 전 세계 사람들에게 중요한 교훈이기 때문이에요."},
+    "현재 보존 방법":{method:"카드", code:"115", content:"광주 5·18민주화운동기록관에 주요 기록이 보관되어 있어요. 국가기록원에도 관련 기록이 있어요. 사람들의 이야기를 녹음해서 모으는 작업도 계속하고 있어요.", connection:"살아 있는 사람들의 이야기를 지금 기록하지 않으면, 시간이 지나면 영원히 사라져요. 그래서 '구술 기록'은 서두를수록 좋아요."},
+    "접근·열람 방법":{method:"웹제공", code:"", content:"광주 5·18민주화운동기록관에 가면 자료를 볼 수 있어요. 인터넷에서도 기록물을 검색할 수 있어요.", connection:""}
+  }},
+  {no:12, category:"근현대", name:"KBS 이산가족을 찾습니다", country:"한국", year:2015, difficulty:2, desc:"138일간 생방송으로 전쟁으로 헤어진 가족을 찾아준 TV 방송 기록", items:{
+    "생산 배경":{method:"웹제공", code:"", content:"1983년, KBS 방송국에서 한국전쟁으로 헤어진 가족을 찾아주는 프로그램을 시작했어요. 무려 138일 동안 생방송을 했고, 10만 명이 넘는 사람들이 신청했어요.", connection:""},
+    "생산 방법":{method:"카드", code:"122", content:"생방송 녹화 테이프 463개, 가족을 찾는 신청서 2만 건 이상, 프로듀서의 업무 수첩 등이 있어요. TV 방송으로 만들어진 기록이라는 점이 특별해요.", connection:"기록은 종이에만 있는 게 아니에요. 비디오테이프, 사진, 음성 파일도 모두 소중한 기록이에요. 기록의 형태는 시대에 따라 달라져요."},
+    "생존 이야기":{method:"웹제공", code:"", content:"비디오테이프는 시간이 지나면 낡아져요. 그래서 디지털 파일로 바꾸는 작업을 했어요. KBS에서 원본 테이프와 디지털 파일을 함께 보관하고 있어요.", connection:""},
+    "기록문화적 가치":{method:"카드", code:"110", content:"TV 방송으로 헤어진 가족을 찾아준 기록이에요. 전쟁의 슬픔을 보여주는 소중한 기록이에요. 2015년에 유네스코 세계기록유산이 되었어요.", connection:"기록은 사람들의 아픔과 기쁨을 담아요. 이산가족이 다시 만나는 장면은 기록이 가진 감동의 힘을 보여줘요."},
+    "현재 보존 방법":{method:"웹제공", code:"", content:"KBS 미디어 아카이브에 원본 테이프와 디지털 파일이 보관되어 있어요. 신청서 등 문서 기록도 따로 관리하고 있어요.", connection:""},
+    "접근·열람 방법":{method:"웹제공", code:"", content:"KBS 아카이브 인터넷 사이트에서 일부 방송 영상을 볼 수 있어요.", connection:""}
+  }}
+];
+
+const CATEGORIES = [
+  {key:"고려", label:"고려 시대", badge:"\uD83C\uDFDB\uFE0F 고려 기록 전문가"},
+  {key:"조선", label:"조선 시대", badge:"\uD83D\uDCDC 조선 기록 전문가"},
+  {key:"근현대", label:"근현대", badge:"\uD83D\uDCF7 근현대 기록 전문가"}
+];
+
+const INV_LABELS = [
+  {key:"생산 배경", sub:"이 기록은 왜 만들어졌는가?"},
+  {key:"생산 방법", sub:"누가, 어떻게 만들었는가?"},
+  {key:"생존 이야기", sub:"어떻게 현재까지 남게 되었는가?"},
+  {key:"기록문화적 가치", sub:"왜 이 기록이 중요한가?"},
+  {key:"현재 보존 방법", sub:"지금은 어떻게 보존되고 있는가?"},
+  {key:"접근·열람 방법", sub:"일반인이 이 기록을 보려면?"}
+];
+
+const LEVELS = [
+  {min:0, name:"견습 기록관"},
+  {min:2, name:"기록 조사관"},
+  {min:4, name:"기록 분석관"},
+  {min:7, name:"기록 보존관"},
+  {min:10, name:"수석 기록관"},
+  {min:12, name:"기록 수호자"}
+];
+
+// === STATE ===
+let state = {completed:{}, loggedIn:false};
+let currentCategory = "";
+let currentHeritage = null;
+
+function loadState(){
+  try{
+    const s = localStorage.getItem("save_the_record_elem_state");
+    if(s) state = JSON.parse(s);
+  }catch(e){}
+}
+function saveState(){
+  localStorage.setItem("save_the_record_elem_state", JSON.stringify(state));
+}
+
+function markItemCompleted(no, key){
+  if(!state.completed[no]) state.completed[no] = {};
+  state.completed[no][key] = true;
+  saveState();
+}
+
+function isItemCompleted(no, key){
+  return !!(state.completed[no] && state.completed[no][key]);
+}
+
+function getCompletedItems(no){
+  if(!state.completed[no]) return [];
+  return Object.keys(state.completed[no]);
+}
+
+function isHeritageComplete(no){
+  return getCompletedItems(no).length >= 6;
+}
+
+function getCompletedHeritageCount(){
+  let c = 0;
+  GAME_DATA.forEach(d=>{if(isHeritageComplete(d.no)) c++;});
+  return c;
+}
+
+function getLevel(){
+  const count = getCompletedHeritageCount();
+  let lvl = 1;
+  for(let i = LEVELS.length - 1; i >= 0; i--){
+    if(count >= LEVELS[i].min){lvl = i + 1; break;}
+  }
+  return lvl;
+}
+
+function getLevelName(){
+  return LEVELS[getLevel()-1].name;
+}
+
+function getCatItems(catKey){
+  return GAME_DATA.filter(d => d.category === catKey);
+}
+
+function isCatComplete(catKey){
+  const items = getCatItems(catKey);
+  return items.length > 0 && items.every(d => isHeritageComplete(d.no));
+}
+
+// === UI HELPERS ===
+function showToast(msg, type, dur){
+  const t = document.createElement("div");
+  t.className = "toast " + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), dur || 2500);
+}
+
+function showOverlay(title, msg){
+  document.getElementById("overlayTitle").textContent = title;
+  document.getElementById("overlayMsg").textContent = msg;
+  document.getElementById("overlay").classList.remove("hidden");
+}
+
+function hideOverlay(){
+  document.getElementById("overlay").classList.add("hidden");
+}
+
+function spawnStars(count){
+  const c = document.getElementById("starsContainer");
+  c.classList.remove("hidden");
+  c.innerHTML = "";
+  for(let i = 0; i < count; i++){
+    const s = document.createElement("div");
+    s.className = "star";
+    s.textContent = "\u2605";
+    s.style.left = (Math.random()*90+5)+"%";
+    s.style.top = (Math.random()*60+10)+"%";
+    s.style.color = ["#FFD700","#FFC107","#FF9800","#E53935","#43A047"][Math.floor(Math.random()*5)];
+    s.style.animationDelay = (Math.random()*0.5)+"s";
+    c.appendChild(s);
+  }
+  setTimeout(()=>{c.classList.add("hidden");c.innerHTML="";}, 1500);
+}
+
+function spawnConfetti(){
+  const c = document.createElement("div");
+  c.className = "celebration";
+  document.body.appendChild(c);
+  const colors = ["#FFD700","#E53935","#43A047","#2196F3","#FF9800","#9C27B0"];
+  for(let i = 0; i < 40; i++){
+    const p = document.createElement("div");
+    p.className = "confetti";
+    p.style.left = (Math.random()*100)+"%";
+    p.style.top = "-10px";
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDelay = (Math.random()*0.8)+"s";
+    p.style.animationDuration = (1+Math.random())+"s";
+    c.appendChild(p);
+  }
+  setTimeout(()=>c.remove(), 2500);
+}
+
+function typewriterEffect(el, text, speed){
+  el.textContent = "";
+  let i = 0;
+  const interval = setInterval(()=>{
+    if(i < text.length){
+      el.textContent += text[i];
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, speed || 15);
+}
+
+// === SCREENS ===
+function hideAll(){
+  ["login","categories","heritageList","report"].forEach(id=>{
+    document.getElementById(id).classList.add("hidden");
+  });
+}
+
+function tryLogin(){
+  const code = document.getElementById("codeInput").value.trim();
+  if(code === "기록문화"){
+    state.loggedIn = true;
+    saveState();
+    showCategories();
+  } else {
+    document.getElementById("loginError").textContent = "코드가 올바르지 않습니다.";
+    document.getElementById("codeInput").classList.add("shake");
+    setTimeout(()=>document.getElementById("codeInput").classList.remove("shake"),400);
+  }
+}
+
+function logout(){
+  state.loggedIn = false;
+  saveState();
+  hideAll();
+  document.getElementById("login").classList.remove("hidden");
+  document.getElementById("codeInput").value = "";
+  document.getElementById("loginError").textContent = "";
+}
+
+function showCategories(){
+  hideAll();
+  document.getElementById("categories").classList.remove("hidden");
+  const lvl = getLevel();
+  const hCount = getCompletedHeritageCount();
+  document.getElementById("levelDisplay").textContent = "Lv."+lvl+" "+getLevelName();
+  document.getElementById("countDisplay").textContent = "완료: "+hCount+"/12건";
+
+  const grid = document.getElementById("catGrid");
+  grid.innerHTML = "";
+  CATEGORIES.forEach(cat=>{
+    const items = getCatItems(cat.key);
+    const done = items.filter(d=>isHeritageComplete(d.no)).length;
+    const btn = document.createElement("button");
+    btn.className = "cat-btn" + (isCatComplete(cat.key)?" completed":"");
+    btn.innerHTML = '<div>'+cat.label+'</div><div class="cat-count">'+done+'/'+items.length+'건 완료</div>';
+    btn.onclick = ()=>showHeritage(cat.key);
+    grid.appendChild(btn);
+  });
+
+  const bl = document.getElementById("badgeList");
+  bl.innerHTML = "";
+  CATEGORIES.forEach(cat=>{
+    const b = document.createElement("div");
+    b.className = "badge-item"+(isCatComplete(cat.key)?" earned":"");
+    b.textContent = cat.badge;
+    bl.appendChild(b);
+  });
+  // Global badge
+  const allDone = CATEGORIES.every(c=>isCatComplete(c.key));
+  const gb = document.createElement("div");
+  gb.className = "badge-item"+(allDone?" earned":"");
+  gb.textContent = "\uD83C\uDFC6 한국 기록 수호자";
+  bl.appendChild(gb);
+}
+
+function showHeritage(catKey){
+  hideAll();
+  currentCategory = catKey;
+  document.getElementById("heritageList").classList.remove("hidden");
+  document.getElementById("levelDisplay2").textContent = "Lv."+getLevel()+" "+getLevelName();
+  document.getElementById("catTitle").textContent = catKey;
+
+  const list = document.getElementById("hList");
+  list.innerHTML = "";
+  const items = getCatItems(catKey);
+  items.forEach(d=>{
+    const div = document.createElement("div");
+    div.className = "heritage-item";
+    const done = isHeritageComplete(d.no);
+    const doneCount = getCompletedItems(d.no).length;
+    div.innerHTML = '<div class="info"><div class="h-name">'+d.name+'</div><div class="h-meta">'+d.country+' | '+d.year+'년 | '+doneCount+'/6</div></div><div class="'+(done?"check":"pending")+'">'+(done?"\u2713":"\u25CB")+'</div>';
+    div.onclick = ()=>showReport(d.no);
+    list.appendChild(div);
+  });
+}
+
+function showReport(no){
+  hideAll();
+  document.getElementById("report").classList.remove("hidden");
+  currentHeritage = no;
+  const d = GAME_DATA.find(x=>x.no===no);
+  const noStr = String(d.no).padStart(2,"0");
+  document.getElementById("reportImg").src = "images_elem/"+noStr+".jpg";
+  document.getElementById("reportImg").alt = d.name;
+  document.getElementById("reportName").textContent = d.name;
+  document.getElementById("reportMeta").textContent = d.country+" | UNESCO "+d.year+"년 등재";
+  document.getElementById("reportDesc").textContent = d.desc || "";
+
+  renderInvList(d);
+}
+
+function renderInvList(d){
+  const doneCount = getCompletedItems(d.no).length;
+  document.getElementById("reportProgress").textContent = doneCount+"/6 완료";
+
+  const list = document.getElementById("invList");
+  list.innerHTML = "";
+
+  INV_LABELS.forEach(inv=>{
+    const item = d.items[inv.key];
+    if(!item) return;
+    const completed = isItemCompleted(d.no, inv.key);
+    const isWeb = item.method === "웹제공";
+
+    const div = document.createElement("div");
+    div.className = "inv-item"+(completed?" completed":"");
+
+    let html = '<div class="inv-label"><span class="status-icon">'+(completed?"\u2713":(isWeb?"\u25C9":"\u25CB"))+'</span> '+inv.key+'</div>';
+    html += '<div class="inv-sublabel">'+inv.sub+'</div>';
+
+    if(isWeb && !completed){
+      // Auto-complete web items on view
+      markItemCompleted(d.no, inv.key);
+      div.className = "inv-item completed";
+      html = '<div class="inv-label"><span class="status-icon">\u2713</span> '+inv.key+'</div>';
+      html += '<div class="inv-sublabel">'+inv.sub+'</div>';
+    }
+
+    if(isWeb || completed){
+      html += '<div class="inv-content" id="content_'+d.no+'_'+inv.key.replace(/[^a-zA-Z가-힣]/g,"")+'">'+item.content+'</div>';
+      if(!isWeb && item.connection){
+        html += '<div class="inv-connection"><div class="conn-title">\uD83D\uDCD4 Point</div>'+item.connection+'</div>';
+      }
+    } else {
+      html += '<div class="locked-msg">\uD83D\uDD12 카드 코드를 입력하세요</div>';
+      html += '<div class="code-input-area">';
+      html += '<input class="digit-box" type="tel" maxlength="1" data-no="'+d.no+'" data-key="'+inv.key+'" data-pos="0" oninput="digitInput(this)" onkeydown="digitKeydown(event,this)">';
+      html += '<input class="digit-box" type="tel" maxlength="1" data-no="'+d.no+'" data-key="'+inv.key+'" data-pos="1" oninput="digitInput(this)" onkeydown="digitKeydown(event,this)">';
+      html += '<input class="digit-box" type="tel" maxlength="1" data-no="'+d.no+'" data-key="'+inv.key+'" data-pos="2" oninput="digitInput(this)" onkeydown="digitKeydown(event,this)">';
+      html += '<button class="code-submit" onclick="submitCode('+d.no+',\''+inv.key.replace(/'/g,"\\'")+'\')">확인</button>';
+      html += '</div>';
+      html += '<div class="code-error" id="err_'+d.no+'_'+inv.key.replace(/[^a-zA-Z가-힣]/g,"")+'"></div>';
+    }
+
+    div.innerHTML = html;
+    list.appendChild(div);
+  });
+
+  // Check if just completed all web items
+  checkAutoComplete(d);
+}
+
+function checkAutoComplete(d){
+  const doneCount = getCompletedItems(d.no).length;
+  document.getElementById("reportProgress").textContent = doneCount+"/6 완료";
+  if(doneCount >= 6 && !d._celebrated){
+    d._celebrated = true;
+    setTimeout(()=>{
+      spawnConfetti();
+      showCompleteOverlay(d);
+      checkLevelUp(d);
+      checkBadge(d);
+    }, 300);
+  }
+}
+
+function showCompleteOverlay(d){
+  const no = String(d.no).padStart(2,"0");
+  document.getElementById("completeImg").src = "images_elem/"+no+".jpg";
+  document.getElementById("completeImg").alt = d.name;
+  document.getElementById("completeName").textContent = d.name;
+  document.getElementById("completeMeta").textContent = d.country+" | UNESCO 세계기록유산 "+d.year+"년 등재";
+  document.getElementById("completeSource").textContent = "사진 출처: 공공 라이선스 이미지";
+  document.getElementById("completeOverlay").classList.remove("hidden");
+}
+
+function closeComplete(){
+  document.getElementById("completeOverlay").classList.add("hidden");
+  showHeritage(currentCategory);
+}
+
+function digitInput(el){
+  const v = el.value.replace(/[^0-9]/g,"");
+  el.value = v.slice(0,1);
+  if(v.length > 0){
+    const pos = parseInt(el.dataset.pos);
+    const siblings = el.parentElement.querySelectorAll(".digit-box");
+    if(pos < 2) siblings[pos+1].focus();
+  }
+}
+
+function digitKeydown(e, el){
+  if(e.key === "Backspace" && el.value === ""){
+    const pos = parseInt(el.dataset.pos);
+    if(pos > 0){
+      const siblings = el.parentElement.querySelectorAll(".digit-box");
+      siblings[pos-1].focus();
+    }
+  }
+  if(e.key === "Enter"){
+    submitCode(parseInt(el.dataset.no), el.dataset.key);
+  }
+}
+
+function submitCode(no, key){
+  const d = GAME_DATA.find(x=>x.no===no);
+  const item = d.items[key];
+  const area = document.querySelector('.code-input-area');
+  if(!area) return;
+
+  // Find the right code input area
+  const allAreas = document.querySelectorAll('.code-input-area');
+  let targetArea = null;
+  allAreas.forEach(a=>{
+    const inputs = a.querySelectorAll('.digit-box');
+    if(inputs.length && inputs[0].dataset.no == no && inputs[0].dataset.key === key){
+      targetArea = a;
+    }
+  });
+  if(!targetArea) return;
+
+  const digits = targetArea.querySelectorAll(".digit-box");
+  const code = Array.from(digits).map(d=>d.value).join("");
+
+  const errId = "err_"+no+"_"+key.replace(/[^a-zA-Z가-힣]/g,"");
+  const errEl = document.getElementById(errId);
+
+  if(code.length < 3){
+    if(errEl) errEl.textContent = "3자리를 모두 입력하세요.";
+    return;
+  }
+
+  if(code === item.code){
+    markItemCompleted(no, key);
+    if(errEl) errEl.textContent = "";
+    showToast("코드 인증 성공!", "success", 1500);
+    spawnStars(8);
+    renderInvList(d);
+    checkLevelUp(d);
+    checkBadge(d);
+  } else {
+    if(errEl) errEl.textContent = "코드가 틀렸습니다.";
+    targetArea.classList.add("shake");
+    setTimeout(()=>targetArea.classList.remove("shake"),400);
+  }
+}
+
+function checkLevelUp(d){
+  const prevLevel = state._lastLevel || 1;
+  const curLevel = getLevel();
+  if(curLevel > prevLevel){
+    state._lastLevel = curLevel;
+    saveState();
+    setTimeout(()=>{
+      showToast("LEVEL UP! Lv."+curLevel+" "+getLevelName(), "level-up", 3000);
+      spawnStars(15);
+    }, 500);
+  }
+  state._lastLevel = curLevel;
+}
+
+function checkBadge(d){
+  CATEGORIES.forEach(cat=>{
+    if(isCatComplete(cat.key)){
+      const bKey = "badge_"+cat.key;
+      if(!state[bKey]){
+        state[bKey] = true;
+        saveState();
+        setTimeout(()=>{
+          showToast("\u2605 뱃지 획득: "+cat.badge+" \u2605", "badge-earned", 3000);
+          spawnStars(20);
+        }, 800);
+      }
+    }
+  });
+  // Check global
+  const allDone = CATEGORIES.every(c=>isCatComplete(c.key));
+  if(allDone && !state.badge_global){
+    state.badge_global = true;
+    saveState();
+    setTimeout(()=>{
+      showOverlay("\uD83C\uDFC6 한국 기록 수호자", "모든 시대의 기록 유산을 완료했습니다! 당신은 진정한 기록 수호자입니다.");
+      spawnConfetti();
+    }, 1500);
+  }
+}
+
+// === INIT ===
+document.getElementById("codeInput").addEventListener("keydown", e=>{
+  if(e.key==="Enter") tryLogin();
+});
+
+loadState();
+state._lastLevel = getLevel();
+if(state.loggedIn){
+  showCategories();
+} else {
+  document.getElementById("login").classList.remove("hidden");
+}
+</script>
+</body>
+</html>
